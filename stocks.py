@@ -12,6 +12,7 @@ Simple stock api.
 import requests
 
 from config import FINNHUB_TOKEN
+from diskcache import Cache
 
 def get_stock_code(stock_name):
     """Get stock code by name"""
@@ -23,13 +24,20 @@ def get_stock_code(stock_name):
     return None
 
 
-def get_stock_info(stock_code):
-    """Get stock info by code"""
-    r = requests.get('https://finnhub.io/api/v1/quote?symbol={}&token={}'.format(stock_code, FINNHUB_TOKEN))
-    if r.status_code == 200:
-        info = r.json()
-        # current price should greater than 0
-        if info['c'] > 0:
-            return info
+def get_stock_info(stock_code, from_cache=True):
+    with Cache('./.cache') as c:
+        if from_cache:
+            data = c.get(stock_code)
+            if data:
+                return data
+            
+        """Get stock info by code"""
+        r = requests.get('https://finnhub.io/api/v1/quote?symbol={}&token={}'.format(stock_code, FINNHUB_TOKEN))
+        if r.status_code == requests.codes.ok:
+            info = r.json()
+            # current price should greater than 0
+            if info['c'] > 0:
+                c.set(stock_code, info, expire=60)
+                return info
     
     return None

@@ -48,7 +48,7 @@ def help_command(update: Update, context: CallbackContext) -> None:
 def echo(update: Update, context: CallbackContext) -> None:
     """Echo the user message."""
     # if message text starts with dollar smybol
-    r = re.match(r'^\$(.+)$', update.message.text)
+    r = re.match(r'^\$(.+)$', update.message.text.upper())
     if not r:
         return False
 
@@ -75,14 +75,15 @@ def build_reply_text(stock_code, info):
     if not info:
         return '未查询到股票信息:' + stock_code
  
-    ratio = round((info['c'] - info['pc']) / info['pc'], 4)
+    ratio = round((info['c'] - info['pc']) / info['pc'], 4) if info['pc'] > 0 else 0
     return "${} 股票实时信息\n" \
            "<b>涨跌幅: {:+.02f}%{}</b>\n" \
            "当前价: ${:.02f}\n" \
-           "开盘价: ${:.02f}\n" \
-           "--------------------\n" \
-           "最高价: ${:.02f}\n" \
-           "最低价: ${:.02f}".format(stock_code, ratio * 100, '📈' if ratio > 0 else '📉', info['c'], info['o'], info['h'], info['l'])
+           "上日收盘价: ${:.02f}\n" \
+           "---------------------------------\n" \
+           "当日开盘价: ${:.02f}\n" \
+           "当日最高价: ${:.02f}\n" \
+           "当日最低价: ${:.02f}".format(stock_code, ratio * 100, '📈' if ratio >= 0 else '📉', info['c'], info['pc'], info['o'], info['h'], info['l'])
 
 
 def main():
