@@ -67,7 +67,7 @@ def echo(update: Update, context: CallbackContext) -> None:
  
     info = stocks.get_stock_info(stock_code)
     text = build_reply_text(stock_code, info)
-    update.message.reply_text(text)
+    update.message.reply_text(text=text, parse_mode='HTML')
 
 
 def build_reply_text(stock_code, info):
@@ -75,13 +75,14 @@ def build_reply_text(stock_code, info):
     if not info:
         return '未查询到股票信息:' + stock_code
  
+    ratio = round((info['c'] - info['pc']) / info['pc'], 4)
     return "${} 股票实时信息\n" \
-           "涨跌幅: {}%\n" \
-           "当前价: ${}\n" \
-           "开盘价: ${}\n" \
+           "<b>涨跌幅: {:+.02f}%{}</b>\n" \
+           "当前价: ${:.02f}\n" \
+           "开盘价: ${:.02f}\n" \
            "--------------------\n" \
-           "最高价: ${}\n" \
-           "最低价: ${}".format(stock_code, round((info['c'] - info['pc']) / info['pc'], 4) * 100, info['c'], info['o'], info['h'], info['l'])
+           "最高价: ${:.02f}\n" \
+           "最低价: ${:.02f}".format(stock_code, ratio * 100, '📈' if ratio > 0 else '📉', info['c'], info['o'], info['h'], info['l'])
 
 
 def main():

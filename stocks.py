@@ -26,9 +26,10 @@ def get_stock_code(stock_name):
 def get_stock_info(stock_code):
     """Get stock info by code"""
     r = requests.get('https://finnhub.io/api/v1/quote?symbol={}&token={}'.format(stock_code, FINNHUB_TOKEN))
-    print(r, stock_code, FINNHUB_TOKEN)
-    print(dir(r))
     if r.status_code == 200:
-        return r.json()
+        info = r.json()
+        # current price should greater than 0
+        if info['c'] > 0:
+            return info
     
     return None
