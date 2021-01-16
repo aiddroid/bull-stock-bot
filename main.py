@@ -17,11 +17,11 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-import config
 import logging
 import re
 import stocks
 
+from config import BOT_TOKEN
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
@@ -79,7 +79,7 @@ def build_reply_text(stock_code, info):
            "涨跌幅: {}%\n" \
            "当前价: ${}\n" \
            "开盘价: ${}\n" \
-           "-------------\n" \
+           "--------------------\n" \
            "最高价: ${}\n" \
            "最低价: ${}".format(stock_code, round((info['c'] - info['pc']) / info['pc'], 4) * 100, info['c'], info['o'], info['h'], info['l'])
 
